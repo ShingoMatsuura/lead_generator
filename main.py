@@ -107,7 +107,7 @@ def extract_company_info(url: str) -> Dict:
 
         completion = client.chat.completions.create(model="gpt-3.5-turbo",
         messages=[
-            {"role": "system", "content": "あなたはWeb上から取得した情報から会社名、住所といった企業情報を抽出し整理するアシスタントです。"},
+            {"role": "system", "content": "あなたはWeb上から取得した情報から会社名、住所、代表者名、TEL、FAX、事業内容といった企業情報を抽出し整理するアシスタントです。"},
             {"role": "user", "content": prompt},
         ],
         temperature=0.2)
