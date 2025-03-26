@@ -5,8 +5,8 @@ from typing import List, Dict
 
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from serpapi import GoogleSearch
-import openai
+from openai import OpenAI
+
 from bs4 import BeautifulSoup
 import requests
 
@@ -17,19 +17,21 @@ GOOGLE_CSE_ID = os.environ.get("GOOGLE_CSE_ID")  # Get from environment variable
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")  # Get from environment variable
 
 
+client = OpenAI(api_key=OPENAI_API_KEY)
+
 if not all([GOOGLE_API_KEY, GOOGLE_CSE_ID, OPENAI_API_KEY]):
     raise ValueError(
         "Please set the GOOGLE_API_KEY, GOOGLE_CSE_ID, and OPENAI_API_KEY environment variables."
     )
 
-openai.api_key = OPENAI_API_KEY
 
 CSV_FILE = "lead_customer_list.csv"
 SEARCH_KEYWORDS = [
-    "software development company in New York",
-    "marketing agency in London",
-    "web design company in Los Angeles",
-    # Add more keywords here
+    "大規模修繕",
+    "外壁改修",
+    "防水工事",
+    "マンション管理",
+    "リフォーム 施工"
 ]
 MAX_RESULTS_PER_KEYWORD = 5  # Number of results to fetch per keyword
 MAX_RETRIES = 3
@@ -88,54 +90,56 @@ def extract_company_info(url: str) -> Dict:
         text_content = soup.get_text(separator=" ", strip=True)
 
         prompt = f"""
-        Extract the following information from the text below:
-        - Company Name
-        - Address
-        - Telephone Number (Tel)
-        - Fax Number (Fax)
-        - A short overview of the company (Overview)
+        以下の情報をテキスト情報から抽出してください。:
 
-        If any information is not found, leave the field blank.
+        - 会社名
+        - 住所
+        - 代表者名
+        - TEL
+        - FAX
+        - 事業内容
 
-        Text:
+        もし情報が見つからなければ、空白を設定してください。
+
+        テキスト情報:
         {text_content}
         """
 
-        completion = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant that extracts information from text."},
-                {"role": "user", "content": prompt},
-            ],
-            temperature=0.2,
-        )
+        completion = client.chat.completions.create(model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "あなたはWeb上から取得した情報から会社名、住所といった企業情報を抽出し整理するアシスタントです。"},
+            {"role": "user", "content": prompt},
+        ],
+        temperature=0.2)
 
         extracted_info = completion.choices[0].message.content
 
         # Basic parsing of the extracted information (can be improved)
         company_data = {
-            "Company Name": "",
-            "Address": "",
-            "Tel": "",
-            "Fax": "",
-            "Overview": "",
+            "会社名": "",
+            "住所": "",
+            "代表者名": "",
+            "TEL": "",
+            "FAX": "",
+            "事業内容": ""
         }
         for line in extracted_info.split("\n"):
             if ":" in line:
                 key, value = line.split(":", 1)
                 key = key.strip()
                 value = value.strip()
-                if key == "Company Name":
-                    company_data["Company Name"] = value
-                elif key == "Address":
-                    company_data["Address"] = value
-                elif key == "Tel":
-                    company_data["Tel"] = value
-                elif key == "Fax":
-                    company_data["Fax"] = value
-                elif key == "Overview":
-                    company_data["Overview"] = value
-
+                if key == "会社名":
+                    company_data["会社名"] = value
+                elif key == "住所":
+                    company_data["住所"] = value
+                elif key == "代表者名":
+                    company_data["代表者名"] = value
+                elif key == "TEL":
+                    company_data["TEL"] = value
+                elif key == "FAX":
+                    company_data["FAX"] = value
+                elif key == "事業内容":
+                    company_data["事業内容"] = value
         return company_data
 
     except requests.exceptions.RequestException as e:
