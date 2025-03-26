@@ -163,7 +163,7 @@ def save_to_csv(data: List[Dict], filename: str):
         return
 
     with open(filename, "w", newline="", encoding="utf-8") as csvfile:
-        fieldnames = ["Keyword", "Company Name", "Address", "Tel", "Fax", "Overview", "URL"]
+        fieldnames = ["Keyword", "会社名", "住所", "代表者名", "TEL", "FAX", "事業内容", "URL"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for row in data:
