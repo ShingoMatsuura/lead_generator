@@ -12,3 +12,7 @@
 1. Get a Custome Search ID
 
 [reference](https://qiita.com/zak_y/items/42ca0f1ea14f7046108c)
+
+# Custom Search Setting
+
+[Custom Search](https://programmablesearchengine.google.com/controlpanel/all)

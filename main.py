@@ -33,6 +33,7 @@ SEARCH_KEYWORDS = [
     "マンション管理",
     "リフォーム 施工"
 ]
+QUERY_ENHANCEMENT = " inurl:about OR inurl:company OR inurl:corporate OR intitle:'企業情報' OR intitle:'会社概要'"
 MAX_RESULTS_PER_KEYWORD = 5  # Number of results to fetch per keyword
 MAX_RETRIES = 3
 RETRY_DELAY = 5
@@ -58,7 +59,7 @@ def google_search_cse(query: str, num_results: int = 10) -> List[str]:
         try:
             res = (
                 service.cse()
-                .list(q=query, cx=GOOGLE_CSE_ID, start=start_index, num=min(10, num_results - len(urls)))
+                .list(q=query + QUERY_ENHANCEMENT, cx=GOOGLE_CSE_ID, start=start_index, num=min(10, num_results - len(urls)))
                 .execute()
             )
             if "items" in res:
