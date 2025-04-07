@@ -31,7 +31,7 @@ SEARCH_KEYWORDS = [
     "外壁改修",
     "防水工事",
     "マンション管理",
-    "リフォーム 施工"
+    "リフォーム施工"
 ]
 QUERY_ENHANCEMENT = " inurl:about OR inurl:company OR inurl:corporate OR intitle:'企業情報' OR intitle:'会社概要'"
 MAX_RESULTS_PER_KEYWORD = 5  # Number of results to fetch per keyword
